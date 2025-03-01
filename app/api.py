@@ -2,6 +2,7 @@ from _datetime import datetime
 import time
 from app.validation import *
 from app.reading import *
+from app.encryption import *
 from flask import request, jsonify, redirect, url_for, render_template, session, make_response
 from app import app
 
@@ -42,11 +43,13 @@ def create_record():
     email = normalize_input(email)
 
     db = read_db("db.txt")
+    hashed_password, salt = hash_with_salt(password)
     db[email] = {
         'nombre': normalize_input(nombre),
         'apellido': normalize_input(apellido),
         'username': normalize_input(username),
-        'password': normalize_input(password),
+        'password': hashed_password,
+        'salt': salt,
         "dni": dni,
         'dob': normalize_input(dob),
         "role":"admin"
@@ -67,12 +70,15 @@ def api_login():
         error = "Credenciales inválidas"
         return render_template('login.html', error=error)
 
-    password_db = db.get(email)["password"]
+    stored_hash = db.get(email)["password"]
+    stored_salt = db.get(email)["salt"]
+    input_hash, _ = hash_with_salt(password + stored_salt)
 
-    if password_db == password :
+    if stored_hash == input_hash:
         session['role'] = db[email]['role']
         return redirect(url_for('customer_menu'))
     else:
+        error = "Credenciales inválidas"
         return render_template('login.html', error=error)
 
 
