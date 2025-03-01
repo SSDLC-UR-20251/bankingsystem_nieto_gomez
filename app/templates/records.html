@@ -61,13 +61,16 @@
                     <td>{{ user_data['role'] }}</td>
                     <td>
                         <a href="/edit_user/{{ email }}" class="btn btn-sm btn-primary">Edit</a>
-                    </td>
+                        {% if role == 'admin' %}
+                          <form action="{{ url_for('delete_user', email=email) }}" method="post" style="display:inline;">
+                              <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                          </form>
+                        {% endif %}
+                    </td>                    
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
-
     </div>
 
     <!-- Bootstrap Scripts -->
