@@ -4,6 +4,10 @@ import re
 import unicodedata
 
 
+intentos = 3
+ban_time = 40
+user_states = {}
+
 def normalize_input(data):
     if isinstance(data, str):
         # Normalizar el texto a la forma canónica
